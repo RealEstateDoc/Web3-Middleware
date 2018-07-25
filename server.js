@@ -6,15 +6,16 @@ const contractService = require('./services/contract.service.js')('http://localh
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+process.env.RED_ContractName = 'RED';
+process.env.RED_ContractAddress = '';
 
 const port = process.env.PORT || 5000;
 
 
 app.get('/api/hash', (req, res) => {
-    let contractAddress = req.query.contractAddress;
     let hashString = req.query.hash;
 
-    contractService.getContractInstance('Voting', contractAddress, (err, instance) => {
+    contractService.getContractInstance(process.env.RED_ContractName, process.env.RED_ContractAddress, (err, instance) => {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
@@ -27,9 +28,8 @@ app.get('/api/hash', (req, res) => {
 app.post('/api/hash', (req, res) => {
     let docId = req.body.docId;
     let hashString = req.body.hashString;
-    let contractAddress = req.body.contractAddress;
 
-    contractService.getContractInstance('Voting', contractAddress, (err, instance) => {
+    contractService.getContractInstance(process.env.RED_ContractName, process.env.RED_ContractAddress, (err, instance) => {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
