@@ -10,18 +10,31 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 5000;
 
 
-app.get('/api/checkHash', (req, res) => {
-    //let val = contractInstance.hashList.call().toString();
+app.get('/api/hash', (req, res) => {
     let contractAddress = req.query.contractAddress;
     let hashString = req.query.hash;
 
-    contractService.getContractInstance('Voting', req.query.contractAddress, (err, instance) => {
+    contractService.getContractInstance('Voting', contractAddress, (err, instance) => {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
-            res.send(instance.checkDocumentHash.call(hashString).toString());
+            res.send(instance.checkDocumentHash(hashString).toString());
         }
 
+    });
+});
+
+app.post('/api/hash', (req, res) => {
+    let docId = req.body.docId;
+    let hashString = req.body.hashString;
+    let contractAddress = req.body.contractAddress;
+
+    contractService.getContractInstance('Voting', contractAddress, (err, instance) => {
+        if (err) {
+            return res.status(500).json({ "error": err });
+        } else {
+            res.send(instance.addDocumentHash(docId, hashString).toString());
+        }
     });
 });
 
