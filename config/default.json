@@ -1,0 +1,7 @@
+{
+    "provider": "http://localhost:8545",
+    "contract": {
+        "name": "RED",
+        "address": "0x7fa3fc3c7f0dc1aebbbb26942dad382629a96835"
+    }
+}

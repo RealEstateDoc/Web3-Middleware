@@ -12,11 +12,13 @@
   "license": "ISC",
   "devDependencies": {
     "ganache-cli": "^6.1.0",
-    "nodemon": "^1.17.3",
-    "solc": "^0.4.23"
+    "nodemon": "^1.17.3"
+    
   },
   "dependencies": {
     "express": "^4.16.3",
+    "solc": "^0.4.23",
+    "config": "^1.31.0",
     "web3": "^0.20.2"
   }
 }

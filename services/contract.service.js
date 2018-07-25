@@ -14,16 +14,8 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
             } else {
                 let compiledCode = solc.compile(file.toString());
                 try {
-                    console.log(`already enter here`);
-                    
                     abiDefinition = JSON.parse(compiledCode.contracts[`:${contractName}`].interface);
                     byteCode = compiledCode.contracts[`:${contractName}`].bytecode;
-
-                    console.log({
-                        abiDefinition,
-                        byteCode
-                    });
-                    
 
                     return cb(null, {
                         abiDefinition,
@@ -37,15 +29,10 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
     }
 
     let getContractInstance = (contractName, contractAddress, cb) => {
-        console.log('method contract instance');
         return getABIandByteCodefromContract(contractName, (err, contractMetadata) => {
-            console.log('getting contract instance');
             if (err) {
-                console.log('ERROR');
-                console.log(err);
                 return cb(err);
             } else {
-                console.log('success');
                 let abi = contractMetadata.abiDefinition;
                 const contract = web3.eth.contract(abi);
                 const instance = contract.at(contractAddress);
@@ -55,7 +42,6 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
     }
 
     let deployNewContract = (accountAddress = web3.eth.accounts[0], contractName, params, cb) => {
-        console.log('deploy new contract');
         getABIandByteCodefromContract(contractName, (err, metadata) => {
             if (err) {
                 return cb(new Error(err));
