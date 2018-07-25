@@ -16,11 +16,25 @@ contract Voting {
   bytes32[] public candidateList;
   uint[] public testArray;
   
+  uint public status = 0;
+  
+  function updateNewStatus(uint _status) public returns (bool) {
+      if(status == _status){
+          status = 999999;
+          return false;
+      }else{
+          status = _status;
+          return true;
+      }
+  }
+  
   struct Voter {
       uint num;
       bytes32 hashStr;
       bool isExist;
   }
+  
+  event newVoter(uint indexNum, bytes32 hash, bool valid);
   
   mapping (bytes32 => Voter) public voterList;
   
@@ -28,8 +42,10 @@ contract Voting {
       if(!voterList[hashStr].isExist){
           var voter = Voter(indexNum, hashStr, true);
           voterList[hashStr] = voter;
+          emit newVoter(indexNum, hashStr, true);
           return true;
       }else{
+          emit newVoter(0, '0x', false);
           return false;
       }
   }
