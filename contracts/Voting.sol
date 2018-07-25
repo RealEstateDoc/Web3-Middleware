@@ -14,6 +14,25 @@ contract Voting {
   */
   
   bytes32[] public candidateList;
+  uint[] public testArray;
+  
+  struct Voter {
+      uint num;
+      bytes32 hashStr;
+      bool isExist;
+  }
+  
+  mapping (bytes32 => Voter) public voterList;
+  
+  function addNewVoter(uint indexNum, bytes32 hashStr) public returns (bool) {
+      if(!voterList[hashStr].isExist){
+          var voter = Voter(indexNum, hashStr, true);
+          voterList[hashStr] = voter;
+          return true;
+      }else{
+          return false;
+      }
+  }
 
   /* This is the constructor which will be called once when you
   deploy the contract to the blockchain. When we deploy the contract,
@@ -21,6 +40,8 @@ contract Voting {
   */
   function Voting(bytes32[] candidateNames) public {
     candidateList = candidateNames;
+    testArray.push(5);
+    testArray.push(7);
   }
 
   // This function returns the total votes a candidate has received so far
@@ -43,5 +64,9 @@ contract Voting {
       }
     }
     return false;
+  }
+  
+  function testMethod(uint variableNumber) public returns (uint){
+      return variableNumber*100;
   }
 }
