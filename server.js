@@ -7,9 +7,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-process.env.RED_ContractName = 'RED';
-process.env.RED_ContractAddress = '';
-
 const port = process.env.PORT || 5000;
 
 
