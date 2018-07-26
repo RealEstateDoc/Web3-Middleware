@@ -19,21 +19,25 @@ app.get('/api/hash', (req, res) => {
             return res.status(500).json({ "error": err });
         } else {
             var result = instance.checkDocumentHash(hashString).toString();
-            res.send(result);
+            return res.send(result);
         }
 
     });
 });
 
+
 app.post('/api/hash', (req, res) => {
     let docId = req.body.docId;
     let hashString = req.body.hashString;
-
-    contractService.getContractInstance(contractConfig.name, contractConfig.address, (err, instance) => {
+    let owner = require('config').get('contract.owner');
+    contractService.addNewHash(docId, hashString, {
+        address: owner.address,
+        private: owner.private
+    }, contractConfig.address, 'addDocumentHash', function (err, hash) {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
-            res.send(instance.addDocumentHash(docId, hashString).toString());
+            return res.status(200).json(hash);
         }
     });
 });
