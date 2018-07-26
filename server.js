@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const contractService = require('./services/contract.service.js')('http://localhost:8545');
 const contractConfig = require('config').get('contract');
+const contractService = require('./services/contract.service.js')(require('config').get('provider'));
+
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,7 +18,8 @@ app.get('/api/hash', (req, res) => {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
-            res.send(instance.checkDocumentHash(hashString).toString());
+            var result = instance.checkDocumentHash(hashString).toString();
+            res.send(result);
         }
 
     });

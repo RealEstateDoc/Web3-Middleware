@@ -1,7 +1,7 @@
 {
-    "provider": "http://localhost:8545",
+    "provider": "https://rinkeby.infura.io/gZXjFZI0io2O0HexZV6c",
     "contract": {
         "name": "RED",
-        "address": "0x7fa3fc3c7f0dc1aebbbb26942dad382629a96835"
+        "address": "0x846a320df9a5ac269adf43127d992de92e1f5c3e"
     }
 }
