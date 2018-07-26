@@ -1,7 +1,5 @@
 pragma solidity ^0.4.23;
-// contract address: 
-// hash: https://packagist.org/packages/hashing/keccak256
-// https://github.com/raineorshine/solidity-by-example/blob/master/remove-from-array.sol
+
 
 contract Owned {
     address owner;
