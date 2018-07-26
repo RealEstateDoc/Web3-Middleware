@@ -62,6 +62,14 @@ contract RED is Owned {
         while (contracts[i].hash_value != _hash) {
             i++;
         }
+        
+        //not exist hash value
+        if(i==0){
+            return false;
+        }
+        //exist hash value
+        return true;
+        
     }
     
     function checkExistDocument(uint _contract_id, bytes32 _hash) view public returns(bool){
