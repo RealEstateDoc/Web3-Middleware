@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 // contract address: 
 // hash: https://packagist.org/packages/hashing/keccak256
-//https://github.com/raineorshine/solidity-by-example/blob/master/remove-from-array.sol
+// https://github.com/raineorshine/solidity-by-example/blob/master/remove-from-array.sol
 
 contract Owned {
     address owner;
@@ -28,13 +28,19 @@ contract RED is Owned {
     uint[] public contractAccts;
     
     
+    
     function addDocumentHash(uint _contract_id, bytes32 _hash) external onlyOwner{
-        Contract storage contract_info = contracts[_contract_id];
         
-        contract_info.created_at = now;
-        contract_info.hash_value = _hash;
+        if(contracts[_contract_id].hash_value == 0){
+            Contract storage contract_info = contracts[_contract_id];
         
-        contractAccts.push(_contract_id) -1;
+            contract_info.created_at = now;
+            contract_info.hash_value = _hash;
+            
+            contractAccts.push(_contract_id) -1;
+        }
+        
+        
     }
     
     /*
@@ -57,19 +63,33 @@ contract RED is Owned {
         return (contracts[_contract_id].created_at, contracts[_contract_id].hash_value);
     }
     
-    //function checkDocumentHash(bytes32 _hash) view public returns(bool){
-    //    uint i = 0;
-    //    while (keccak256(contracts[i].hash_value) != keccak256(_hash)) {
-    //        i++;
-    //    }
-    //}
+    function checkDocumentHash(bytes32 _hash) view public returns(bool){
+        uint i = 0;
+        while (contracts[i].hash_value != _hash) {
+            i++;
+        }
+        
+        //not exist hash value
+        if(i==0){
+            return false;
+        }
+        //exist hash value
+        return true;
+        
+    }
     
-    function checkDocumentContractID(uint _contract_id, bytes32 _hash) view public returns(bool){
-        if(keccak256(contracts[_contract_id].hash_value) != keccak256(_hash)){
+    function checkExistDocument(uint _contract_id, bytes32 _hash) view public returns(bool){
+        //hash value don't change
+        if(contracts[_contract_id].hash_value == _hash){
             return true;
         }
+        //hash value changed
         return false;
     }
+    
+    /*
+    @return uint total contracts
+    */
     
     function countContracts() view public returns(uint){
         return contractAccts.length;
