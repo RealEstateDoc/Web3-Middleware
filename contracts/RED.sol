@@ -1,5 +1,7 @@
 pragma solidity ^0.4.23;
-
+// contract address: 
+// hash: https://packagist.org/packages/hashing/keccak256
+// https://github.com/raineorshine/solidity-by-example/blob/master/remove-from-array.sol
 
 contract Owned {
     address owner;
@@ -63,16 +65,38 @@ contract RED is Owned {
     
     function checkDocumentHash(bytes32 _hash) view public returns(bool){
         uint i = 0;
+        uint tmp = 0;
+        uint num = contractAccts.length;
+        uint flag = 0;
         while (contracts[i].hash_value != _hash) {
+            
+            if(contracts[i].hash_value>0){
+                tmp+=1;
+            }
+            
+            //flag check hash exist
+            if(contracts[i].hash_value == _hash){
+                flag = 1;
+                break;
+            }
+            
+            //check limit loop
+            if(tmp==num){
+                if(flag==0){
+                    i = 0;
+                }
+                break;
+            }
+            
             i++;
         }
         
-        //not exist hash value
+        not exist hash value
         if(i==0){
             return false;
         }
         //exist hash value
-        return true;
+       return true;
         
     }
     
