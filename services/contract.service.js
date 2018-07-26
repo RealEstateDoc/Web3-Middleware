@@ -1,6 +1,6 @@
 const solc = require('solc');
 const fs = require('fs');
-const Web3 = require('web3')
+const Web3 = require('web3');
 
 
 module.exports = (urlProvider = 'http://localhost:8545') => {
@@ -26,7 +26,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
                 }
             }
         });
-    }
+    };
 
     let getContractInstance = (contractName, contractAddress, cb) => {
         return getABIandByteCodefromContract(contractName, (err, contractMetadata) => {
@@ -39,7 +39,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
                 return cb(null, instance);
             }
         });
-    }
+    };
 
     let deployNewContract = (accountAddress = web3.eth.accounts[0], contractName, params, cb) => {
         getABIandByteCodefromContract(contractName, (err, metadata) => {
@@ -61,9 +61,36 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
                 }
             }
         });
-    }
+    };
+
+    let addNewHash = (docId, hashstr, from, to, method, cb) => {
+        getContractInstance('RED', to, (err, instance) => {
+            var Tx = require('ethereumjs-tx');
+            var privateKey = new Buffer(from.private, 'hex')
+
+            var rawTx = {
+                nonce: web3.toHex(web3.eth.getTransactionCount(from.address)),
+                gasPrice: web3.toHex(2000000000),
+                gasLimit: web3.toHex(100000),
+                to: to,
+                value: '0x00',
+                data: instance[method].getData(docId, hashstr)
+            }
+
+            var tx = new Tx(rawTx);
+            tx.sign(privateKey);
+
+            var serializedTx = tx.serialize();
+
+
+            web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
+                return cb(err, hash);
+            });
+        });
+    };
 
     return {
+        addNewHash,
         getContractInstance,
         getABIandByteCodefromContract,
         deployNewContract
