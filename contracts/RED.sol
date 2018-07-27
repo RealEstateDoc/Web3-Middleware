@@ -67,33 +67,18 @@ contract RED is Owned {
         uint i = 0;
         uint tmp = 0;
         uint num = contractAccts.length;
-        uint flag = 0;
         while (contracts[i].hash_value != _hash) {
             
             if(contracts[i].hash_value>0){
                 tmp+=1;
             }
             
-            //flag check hash exist
-            if(contracts[i].hash_value == _hash){
-                flag = 1;
-                break;
-            }
-            
-            //check limit loop
+            //not exist hash value
             if(tmp==num){
-                if(flag==0){
-                    i = 0;
-                }
-                break;
+                return false;
             }
             
             i++;
-        }
-        
-        //not exist hash value
-        if(i==0){
-            return false;
         }
         //exist hash value
        return true;
