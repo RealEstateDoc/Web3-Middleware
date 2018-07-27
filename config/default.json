@@ -3,6 +3,7 @@
     "contract": {
         "name": "RED",
         "address": "0x846a320df9a5ac269adf43127d992de92e1f5c3e",
+        "gasLimitDefault": 200000,
         "owner": {
             "address": "0x8B774afFBb38d87767fCa579A289a01787572493",
             "private": ""

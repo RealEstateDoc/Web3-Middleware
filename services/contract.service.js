@@ -67,11 +67,11 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
         getContractInstance('RED', to, (err, instance) => {
             var Tx = require('ethereumjs-tx');
             var privateKey = new Buffer(from.private, 'hex')
-
+            
             var rawTx = {
                 nonce: web3.toHex(web3.eth.getTransactionCount(from.address)),
                 gasPrice: web3.toHex(2000000000),
-                gasLimit: web3.toHex(100000),
+                gasLimit: web3.toHex(web3.toHex(require('config').get('contract.gasLimitDefault'))),
                 to: to,
                 value: '0x00',
                 data: instance[method].getData(docId, hashstr)
