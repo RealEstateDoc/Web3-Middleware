@@ -2,11 +2,11 @@
     "provider": "https://rinkeby.infura.io/gZXjFZI0io2O0HexZV6c",
     "contract": {
         "name": "RED",
-        "address": "0x846a320df9a5ac269adf43127d992de92e1f5c3e",
-        "gasLimitDefault": 200000,
+        "address": "0x7a824ee91d12c9eb6323194196b28562c41c3ac1",
+        "gasLimitDefault": 210000,
+        "gasPriceDefault": 20000000000,
         "owner": {
             "address": "0x8B774afFBb38d87767fCa579A289a01787572493",
-            "private": ""
         }
     }
 }
