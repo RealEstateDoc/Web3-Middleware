@@ -91,7 +91,7 @@ contract RED is Owned {
             i++;
         }
         
-        not exist hash value
+        //not exist hash value
         if(i==0){
             return false;
         }
