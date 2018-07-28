@@ -3,7 +3,8 @@ pragma solidity ^0.4.23;
 This contract only for demo purpose, do not use it in production!
 */
 //The latest version of contract deployed at
-//https://rinkeby.etherscan.io/address/0x3295be4567fc69b222237d6d4b49015bebea7980
+//https://rinkeby.etherscan.io/address/0x4c3e8ee2f97b759c1edc8197ec1c00888e25f242#code
+
 contract RedDemo {
     address owner;
 
@@ -59,11 +60,7 @@ contract RedDemo {
     // This function check if a hash is exist in blockchain
     function checkDocumentByHash(bytes32 _hash) view public returns (bool)  {
         // If has data contracts[_hash], it mean the hash stored
-        if(contracts[_hash].doc_id == 0) {
-            return false;
-        }else{
-            return true;
-        }
+        return contracts[_hash].hash_value == _hash;
     }
 
     // This function check if a hash is exist in blockchain
