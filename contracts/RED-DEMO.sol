@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 This contract only for demo purpose, do not use it in production!
 */
 //The latest version of contract deployed at
-//https://rinkeby.etherscan.io/address/0x4c3e8ee2f97b759c1edc8197ec1c00888e25f242#code
+//https://rinkeby.etherscan.io/address/0x51000fee8980e0c82c32d12e04c2751f2cf35e3b
 
 contract RedDemo {
     address owner;
@@ -25,6 +25,10 @@ contract RedDemo {
 
     // This array store the data of contract
     mapping (bytes32 => Contract) contracts;
+
+    event DocumentAdded(Contract theContract);
+
+    event DocumentDuplicated(Contract existContract);
 
     // constructor and set owner by person who deployed the contract
     constructor() public {
@@ -49,10 +53,16 @@ contract RedDemo {
             // update the latest _hash
             latest_hash[_doc_id] = _hash;
 
+            //
+            emit  DocumentAdded(aContract);
+
             // return true , store success
             return true;
         }else{
             // the hash already exist, do not allow for overwrite
+            // It will not return in this kind of function, so consider to use event to log the result, also
+            Contract memory existContract = contracts[_hash];
+            emit DocumentDuplicated(existContract);
             return false;
         }
     }
