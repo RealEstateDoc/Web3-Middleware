@@ -1,7 +1,5 @@
 pragma solidity ^0.4.23;
-// contract address: 
-// hash: https://packagist.org/packages/hashing/keccak256
-// https://github.com/raineorshine/solidity-by-example/blob/master/remove-from-array.sol
+
 
 contract Owned {
     address owner;
@@ -19,25 +17,26 @@ contract Owned {
 contract RED is Owned {
     
     struct Contract{
+        uint doc_id;
+        uint trail_id;
         uint created_at;
-        bytes32 hash_value;
     }
     
-    mapping (uint => Contract) contracts;
+    //save hash
+    mapping (bytes32 => Contract) contracts;
     
-    uint[] public contractAccts;
+    bytes32[] public contractAccts;
     
     
-    
-    function addDocumentHash(uint _contract_id, bytes32 _hash) external onlyOwner{
+    function addDocumentHash(uint _doc_id, uint _trail_id, bytes32 _hash) external onlyOwner{
         
-        if(contracts[_contract_id].hash_value == 0){
-            Contract storage contract_info = contracts[_contract_id];
-        
-            contract_info.created_at = now;
-            contract_info.hash_value = _hash;
+        if(contracts[_hash].trail_id == 0){
+            Contract storage contract_info = contracts[_hash];
             
-            contractAccts.push(_contract_id) -1;
+            contract_info.created_at = now;
+            contract_info.doc_id = _doc_id;
+            contract_info.trail_id = _trail_id;
+            contractAccts.push(_hash) -1;
         }
         
         
@@ -49,50 +48,20 @@ contract RED is Owned {
     @return array uint
     
     */
-    function getDocumentHashs() view public returns(uint[]){
+    function getDocumentHashs() view public returns(bytes32[]){
         return contractAccts;
     }
     
 
-    /*
-    @return info in contract id
-    @return unit (created_at), bytes32 (hash)
-    */
     
-    function getDocumentHash(uint _contract_id) view public returns(uint, bytes32){
-        return (contracts[_contract_id].created_at, contracts[_contract_id].hash_value);
-    }
-    
-    function checkDocumentHash(bytes32 _hash) view public returns(bool){
-        uint i = 0;
-        uint tmp = 0;
-        uint num = contractAccts.length;
-        while (contracts[i].hash_value != _hash) {
-            
-            if(contracts[i].hash_value>0){
-                tmp+=1;
-            }
-            
-            //not exist hash value
-            if(tmp==num){
-                return false;
-            }
-            
-            i++;
+    function checkDocumentHash(bytes32 _hash) view public returns(uint, uint, uint){
+        if(contracts[_hash].trail_id > 0){
+            return (contracts[_hash].doc_id, contracts[_hash].trail_id, contracts[_hash].created_at);
         }
-        //exist hash value
-       return true;
+        return (0,0,0);
         
     }
     
-    function checkExistDocument(uint _contract_id, bytes32 _hash) view public returns(bool){
-        //hash value don't change
-        if(contracts[_contract_id].hash_value == _hash){
-            return true;
-        }
-        //hash value changed
-        return false;
-    }
     
     /*
     @return uint total contracts
