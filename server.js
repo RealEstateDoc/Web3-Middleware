@@ -15,8 +15,8 @@ app.post('/api/whitelist', (req, res) => {
     let addressList = new Array(req.body.address);
 
     contractService.sendTransactionRaw('WHITELIST', addressList, "addWhiteListed", {
-        address: config.get('contract.owner.address'),
-        private: config.get('contract.owner.private')
+        address: config.get('contract.whiteLister.address'),
+        private: config.get('contract.whiteLister.private')
     }, config.get('contract.address'), function (err, hash) {
         if (err) {
             return res.status(500).json({ "error": err });
@@ -32,8 +32,8 @@ app.post('/api/whitelist', (req, res) => {
 app.delete('/api/whitelist', (req, res) => {
     let address = req.body.address;
     contractService.sendTransactionRaw('WHITELIST', address, "removeWhiteListed", {
-        address: config.get('contract.owner.address'),
-        private: config.get('contract.owner.private')
+        address: config.get('contract.whiteLister.address'),
+        private: config.get('contract.whiteLister.private')
     }, config.get('contract.address'), function (err, hash) {
         if (err) {
             return res.status(500).json({ "error": err });
