@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const contractConfig = require('config').get('contract');
 const contractService = require('./services/contract.service.js')(require('config').get('provider'));
-
+const config = require('config');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,14 +26,12 @@ app.get('/api/hash', (req, res) => {
 });
 
 
-app.post('/api/hash', (req, res) => {
-    let docId = req.body.docId;
-    let hashString = req.body.hashString;
-    let owner = require('config').get('contract.owner');
-    contractService.addNewHash(docId, hashString, {
-        address: owner.address,
-        private: owner.private
-    }, contractConfig.address, 'addDocumentHash', function (err, hash) {
+app.post('/api/whitelist', (req, res) => {
+    let addressList = new Array(req.body.address);
+    contractService.addNewWhiteList(addressList, {
+        address: config.get('contract.whiteLister.address'),
+        private: config.get('contract.whiteLister.private')
+    }, config.get('contract.address'), function (err, hash) {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
@@ -41,22 +39,6 @@ app.post('/api/hash', (req, res) => {
         }
     });
 });
-
-
-// app.get('/api/deployContract/:contract', (req, res) => {
-//     let contractName = req.params.contract;
-//     return contractService.deployNewContract(undefined, contractName, ['Nick', 'Rams'], (err, contract) => {
-//         console.log(contract);
-//         if (err) {
-//             return res.status(500).json({ "error": err });
-//         } else {
-//             console.log(contract);
-//             return res.status(200).json(contract);
-//         }
-
-//     });
-// });
-
 
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

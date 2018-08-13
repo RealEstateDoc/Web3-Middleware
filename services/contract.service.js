@@ -1,6 +1,7 @@
 const solc = require('solc');
 const fs = require('fs');
 const Web3 = require('web3');
+const config = require('config');
 
 
 module.exports = (urlProvider = 'http://localhost:8545') => {
@@ -14,9 +15,11 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
             } else {
                 let compiledCode = solc.compile(file.toString());
                 try {
-                    abiDefinition = JSON.parse(compiledCode.contracts[`:${contractName}`].interface);
-                    byteCode = compiledCode.contracts[`:${contractName}`].bytecode;
-
+                    abiDefinition = config.get('contract.abi');
+                    byteCode = config.get('contract.bytecode');
+                    //abiDefinition = JSON.parse(compiledCode.contracts[`:${contractName}`].interface);
+                    //byteCode = compiledCode.contracts[`:${contractName}`].bytecode;
+                    
                     return cb(null, {
                         abiDefinition,
                         byteCode
@@ -63,18 +66,17 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
         });
     };
 
-    let addNewHash = (docId, hashstr, from, to, method, cb) => {
-        getContractInstance('RED', to, (err, instance) => {
+    let addNewWhiteList = (addressList, from, to, cb) => {
+        getContractInstance('WHITELIST', to, (err, instance) => {
             var Tx = require('ethereumjs-tx');
             var privateKey = new Buffer(from.private, 'hex')
-
             var rawTx = {
-                nonce: web3.toHex(web3.eth.getTransactionCount(from.address, 'pending')),
+                nonce: web3.toHex(web3.eth.getTransactionCount(from.address)),
                 gasPrice: web3.toHex(web3.toHex(require('config').get('contract.gasPriceDefault'))),
                 gasLimit: web3.toHex(web3.toHex(require('config').get('contract.gasLimitDefault'))),
                 to: to,
                 value: '0x0',
-                data: instance[method].getData(docId, hashstr)
+                data: instance.addWhiteListed.getData(addressList)
             };
 
             var tx = new Tx(rawTx);
@@ -90,7 +92,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
     };
 
     return {
-        addNewHash,
+        addNewWhiteList,
         getContractInstance,
         getABIandByteCodefromContract,
         deployNewContract
