@@ -11,32 +11,36 @@ app.use(bodyParser.json());
 const port = process.env.PORT || 5000;
 
 
-app.get('/api/hash', (req, res) => {
-    let hashString = req.query.hash;
-
-    contractService.getContractInstance(contractConfig.name, contractConfig.address, (err, instance) => {
-        if (err) {
-            return res.status(500).json({ "error": err });
-        } else {
-            var result = instance.checkDocumentHash(hashString).toString();
-            return res.send(result);
-        }
-
-    });
-});
-
-
 app.post('/api/whitelist', (req, res) => {
     let addressList = new Array(req.body.address);
-    contractService.addNewWhiteList(addressList, {
-        address: config.get('contract.whiteLister.address'),
-        private: config.get('contract.whiteLister.private')
+
+    contractService.sendTransactionRaw('WHITELIST', addressList, "addWhiteListed", {
+        address: config.get('contract.owner.address'),
+        private: config.get('contract.owner.private')
     }, config.get('contract.address'), function (err, hash) {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
             return res.status(200).json({
-                txid:hash});
+                txid: hash
+            });
+        }
+    });
+});
+
+
+app.delete('/api/whitelist', (req, res) => {
+    let address = req.body.address;
+    contractService.sendTransactionRaw('WHITELIST', address, "removeWhiteListed", {
+        address: config.get('contract.owner.address'),
+        private: config.get('contract.owner.private')
+    }, config.get('contract.address'), function (err, hash) {
+        if (err) {
+            return res.status(500).json({ "error": err });
+        } else {
+            return res.status(200).json({
+                txid: hash
+            });
         }
     });
 });

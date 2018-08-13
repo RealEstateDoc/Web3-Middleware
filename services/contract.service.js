@@ -19,7 +19,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
                     byteCode = config.get('contract.bytecode');
                     //abiDefinition = JSON.parse(compiledCode.contracts[`:${contractName}`].interface);
                     //byteCode = compiledCode.contracts[`:${contractName}`].bytecode;
-                    
+
                     return cb(null, {
                         abiDefinition,
                         byteCode
@@ -66,17 +66,19 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
         });
     };
 
-    let addNewWhiteList = (addressList, from, to, cb) => {
-        getContractInstance('WHITELIST', to, (err, instance) => {
+
+
+    let sendTransactionRaw = (contractName, data, method, from, to, cb) => {
+        getContractInstance(contractName, to, (err, instance) => {
             var Tx = require('ethereumjs-tx');
             var privateKey = new Buffer(from.private, 'hex')
             var rawTx = {
-                nonce: web3.toHex(web3.eth.getTransactionCount(from.address)),
+                nonce: web3.toHex(web3.eth.getTransactionCount(from.address, 'pending')),
                 gasPrice: web3.toHex(web3.toHex(require('config').get('contract.gasPriceDefault'))),
                 gasLimit: web3.toHex(web3.toHex(require('config').get('contract.gasLimitDefault'))),
                 to: to,
                 value: '0x0',
-                data: instance.addWhiteListed.getData(addressList)
+                data: instance[method].getData(data)
             };
 
             var tx = new Tx(rawTx);
@@ -92,7 +94,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
     };
 
     return {
-        addNewWhiteList,
+        sendTransactionRaw,
         getContractInstance,
         getABIandByteCodefromContract,
         deployNewContract
