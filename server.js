@@ -35,7 +35,8 @@ app.post('/api/whitelist', (req, res) => {
         if (err) {
             return res.status(500).json({ "error": err });
         } else {
-            return res.status(200).json(hash);
+            return res.status(200).json({
+                txid:hash});
         }
     });
 });
