@@ -646,6 +646,7 @@ contract Escrow_Contract is Ownable {
       uint currentDepositBalance;
       uint32 leasingExpiry;
       State currentState;
+      mapping(address => bool) approvalList;
   }
   
   
@@ -661,9 +662,7 @@ contract Escrow_Contract is Ownable {
   
   constructor() public {
       
-    
-     // hard code for testing section
-     
+     // hard code for testing
      token = new REDTToken(owner);
      // mint to lubu 123 tokens
      token.mint(LUBU, 123);
@@ -682,14 +681,12 @@ contract Escrow_Contract is Ownable {
      
   }
   
-  function createEscrow(uint _contractId, address _tenant, address _landlord, uint _depositTokenAmount, uint32 _leasingExpiry) onlyOwner public returns(address, address, uint, uint, uint8){
+  function createEscrow(uint _contractId, address _tenant, address _landlord, uint _depositTokenAmount, uint32 _leasingExpiry) onlyOwner public returns(bool){
     require(!escrows[_contractId].exists); // check existence
     require(now < _leasingExpiry); // should be in future
     escrows[_contractId] = Escrow(true, _tenant,_landlord, _depositTokenAmount, 0, _leasingExpiry, State(STATUS_NEW, msg.sender));
     contract_count++;
-    //return true;
-        Escrow memory escrow = escrows[_contractId];
-      return (escrow.tenant, escrow.landlord, escrow.depositTokenAmount, escrow.currentDepositBalance, escrow.currentState.state);
+    return true;
   }
   
   function getEscrow(uint _contractId) public view returns(address, address, uint, uint, uint8) {
@@ -738,28 +735,35 @@ contract Escrow_Contract is Ownable {
   uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT = 0x012;
   uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD = 0x013;
 
-  function tenantRequestForRefund(uint _contractId) returns (uint8){
+  function confirmEscrow(uint _contractId) public returns (bool){
+      require(escrows[_contractId].exists); // check existence
+      require(escrows[_contractId].tenant == msg.sender || escrows[_contractId].landlord == msg.sender);
+      escrows[_contractId].approvalList[msg.sender] = true;
+  }
+  
+  function tenantRequestForRefund(uint _contractId) public returns (uint8){
       require(escrows[_contractId].tenant == msg.sender); // check if tenant
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_TENANT);
   }
   
-  function tenantRequestForArpprove(uint _contractId) returns (uint8){
+  function tenantRequestForArpprove(uint _contractId) public returns (uint8){
       require(escrows[_contractId].tenant == msg.sender); // check if tenant
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT);
   }
   
-  function landlordRequestForRefund(uint _contractId) returns (uint8){
+  function landlordRequestForRefund(uint _contractId) public returns (uint8){
       require(escrows[_contractId].landlord == msg.sender); // check if landlord
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_LANDLORD);
   }
   
-  function landlordRequestForArpprove(uint _contractId) returns (uint8){
+  function landlordRequestForArpprove(uint _contractId) public returns (uint8){
       require(escrows[_contractId].landlord == msg.sender); // check if landlord
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD);
   }
   
   function processRequestMessage(uint _contractId, uint8 _action) private returns (uint8){
       require(escrows[_contractId].exists); // check existence
+      require(escrows[_contractId].approvalList[escrows[_contractId].tenant] && escrows[_contractId].approvalList[escrows[_contractId].landlord]); // check if deposit is ready
       require(escrows[_contractId].currentState.state != STATUS_RELEASED); // check if contract completed
       
       if(_action == ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT) {
