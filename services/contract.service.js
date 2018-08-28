@@ -16,14 +16,14 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
                 try {
                     abiDefinition = JSON.parse(compiledCode.contracts[`:${contractName}`].interface);
                     byteCode = compiledCode.contracts[`:${contractName}`].bytecode;
-
-                    return cb(null, {
-                        abiDefinition,
-                        byteCode
-                    });
                 } catch (e) {
                     return cb(new Error('Unable to parse and compile contract code !'));
                 }
+
+                return cb(null, {
+                    abiDefinition,
+                    byteCode
+                });
             }
         });
     };
@@ -48,7 +48,7 @@ module.exports = (urlProvider = 'http://localhost:8545') => {
             } else {
 
                 let web3Contract = web3.eth.contract(metadata.abiDefinition);
-                let deployedContract = web3Contract.new(params, { data: metadata.byteCode, from: accountAddress, gas: 4700000 });
+                let deployedContract = web3Contract.new(params, { data: metadata.byteCode, from: accountAddress, gas: 7500000 });
                 let receipt = web3.eth.getTransactionReceipt(deployedContract.transactionHash);
 
                 if (receipt && receipt.contractAddress) {
