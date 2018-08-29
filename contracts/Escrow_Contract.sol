@@ -674,10 +674,10 @@ contract Escrow_Contract is Ownable {
      
      
      // create hard code new escrow
-     uint depositValue = 10;
-     createEscrow(123, LUBU, RYOMA, depositValue, 1537189200);
+     //uint depositValue = 10;
+     //createEscrow(123, LUBU, RYOMA, depositValue, 1537189200);
      // hard code allowance
-     token.setApprove(LUBU, address(this), depositValue);
+     //token.setApprove(LUBU, address(this), depositValue);
      
   }
   
@@ -740,13 +740,17 @@ contract Escrow_Contract is Ownable {
       require(escrows[_contractId].tenant == msg.sender || escrows[_contractId].landlord == msg.sender);
       escrows[_contractId].approvalList[msg.sender] = true;
   }
+
+  function isConfirmed(uint _contractId, address _actor) public view returns (bool){
+    return escrows[_contractId].approvalList[_actor];
+  }
   
   function tenantRequestForRefund(uint _contractId) public returns (uint8){
       require(escrows[_contractId].tenant == msg.sender); // check if tenant
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_TENANT);
   }
   
-  function tenantRequestForArpprove(uint _contractId) public returns (uint8){
+  function tenantRequestForApprove(uint _contractId) public returns (uint8){
       require(escrows[_contractId].tenant == msg.sender); // check if tenant
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT);
   }
@@ -756,7 +760,7 @@ contract Escrow_Contract is Ownable {
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_LANDLORD);
   }
   
-  function landlordRequestForArpprove(uint _contractId) public returns (uint8){
+  function landlordRequestForApprove(uint _contractId) public returns (uint8){
       require(escrows[_contractId].landlord == msg.sender); // check if landlord
       return processRequestMessage(_contractId, ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD);
   }
