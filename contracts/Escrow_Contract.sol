@@ -647,12 +647,14 @@ contract Escrow_Contract is Ownable {
       uint32 leasingExpiry;
       State currentState;
       mapping(address => bool) approvalList;
+      bytes32 hashDoc;
   }
   
   
   
   mapping(uint => Escrow) public escrows;
-  uint public contract_count;
+  uint public escrow_contract_count;
+  mapping(bytes32 => bool) public listHashDoc;
   
   address constant ZANIS = 0xdb8209274f8dd94ea9d38a7f9feae8ce83fb6388;
   address constant LUBU = 0x7c87200958b6831f7b803bc307e3793c4e98dd9e;
@@ -675,23 +677,28 @@ contract Escrow_Contract is Ownable {
      
      // create hard code new escrow
      //uint depositValue = 10;
-     //createEscrow(123, LUBU, RYOMA, depositValue, 1537189200);
+     //createEscrow(123, LUBU, RYOMA, depositValue, 1537189200, 0xb424839777e8131ea2d999b4263a07d0f91541938d85e7d84de8048672d6f8b6);
      // hard code allowance
      //token.setApprove(LUBU, address(this), depositValue);
      
   }
   
-  function createEscrow(uint _contractId, address _tenant, address _landlord, uint _depositTokenAmount, uint32 _leasingExpiry) onlyOwner public returns(bool){
+  function createEscrow(uint _contractId, address _tenant, address _landlord, uint _depositTokenAmount, uint32 _leasingExpiry, bytes32 _hashDoc) onlyOwner public returns(bool){
     require(!escrows[_contractId].exists); // check existence
     require(now < _leasingExpiry); // should be in future
-    escrows[_contractId] = Escrow(true, _tenant,_landlord, _depositTokenAmount, 0, _leasingExpiry, State(STATUS_NEW, msg.sender));
-    contract_count++;
+    escrows[_contractId] = Escrow(true, _tenant,_landlord, _depositTokenAmount, 0, _leasingExpiry, State(STATUS_NEW, msg.sender), _hashDoc);
+    listHashDoc[_hashDoc] = true;
+    escrow_contract_count++;
     return true;
   }
   
-  function getEscrow(uint _contractId) public view returns(address, address, uint, uint, uint8) {
+  function isHashDocExisted(bytes32 _hashDoc) public view returns(bool) {
+      return listHashDoc[_hashDoc];
+  }
+  
+  function getEscrow(uint _contractId) public view returns(address, address, uint, uint, uint8, bytes32) {
       Escrow memory escrow = escrows[_contractId];
-      return (escrow.tenant, escrow.landlord, escrow.depositTokenAmount, escrow.currentDepositBalance, escrow.currentState.state);
+      return (escrow.tenant, escrow.landlord, escrow.depositTokenAmount, escrow.currentDepositBalance, escrow.currentState.state, escrow.hashDoc);
   }
   
   
