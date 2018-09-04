@@ -583,42 +583,6 @@ contract REDTToken is PausableToken, REDTTokenConfig, Salvageable {
  */
 contract Escrow_Contract is Ownable {
   using SafeMath for uint256;
-
-  event Deposited(address indexed payee, uint256 weiAmount);
-  event Withdrawn(address indexed payee, uint256 weiAmount);
-
-  mapping(address => uint256) private deposits;
-
-  function depositsOf(address _payee) public view returns (uint256) {
-    return deposits[_payee];
-  }
-
-  /**
-  * @dev Stores the sent amount as credit to be withdrawn.
-  * @param _payee The destination address of the funds.
-  */
-  function deposit(address _payee) public onlyOwner payable {
-    uint256 amount = msg.value;
-    deposits[_payee] = deposits[_payee].add(amount);
-
-    emit Deposited(_payee, amount);
-  }
-
-  /**
-  * @dev Withdraw accumulated balance for a payee.
-  * @param _payee The address whose funds will be withdrawn and transferred to.
-  */
-  function withdraw(address _payee) public onlyOwner {
-    uint256 payment = deposits[_payee];
-    //assert(address(this).balance >= payment);
-
-    deposits[_payee] = 0;
-
-    _payee.transfer(payment);
-
-    emit Withdrawn(_payee, payment);
-  }
-  
   
   event DepositedToken(address indexed payee, uint256 tokenAmount);
   event WithdrawnToken(address indexed payee, uint256 tokenAmount);
@@ -626,12 +590,17 @@ contract Escrow_Contract is Ownable {
   
  
   
-    uint8 constant STATUS_NEW = 0x01;
-    uint8 constant STATUS_DEPOSITTED = 0x02;
-    uint8 constant STATUS_REQUEST_FUND = 0x03;
-    uint8 constant STATUS_APPROVED = 0x04;
-    uint8 constant STATUS_RELEASED = 0x05;
-    uint8 constant STATUS_DISPUTED = 0x06;
+uint8 constant STATUS_NEW = 0x01;
+uint8 constant STATUS_DEPOSITTED = 0x02;
+uint8 constant STATUS_REQUEST_FUND = 0x03;
+uint8 constant STATUS_APPROVED = 0x04;
+uint8 constant STATUS_RELEASED = 0x05;
+uint8 constant STATUS_DISPUTED = 0x06;
+    
+  uint8 constant ACTION_REQUEST_FUND_RELEASE_TENANT = 0x010;
+  uint8 constant ACTION_REQUEST_FUND_RELEASE_LANDLORD = 0x011;
+  uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT = 0x012;
+  uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD = 0x013;
   
   struct State {
       uint8 state;
@@ -737,10 +706,6 @@ contract Escrow_Contract is Ownable {
       return true;
   }
   
-  uint8 constant ACTION_REQUEST_FUND_RELEASE_TENANT = 0x010;
-  uint8 constant ACTION_REQUEST_FUND_RELEASE_LANDLORD = 0x011;
-  uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_TENANT = 0x012;
-  uint8 constant ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD = 0x013;
 
   function confirmEscrow(uint _contractId) public returns (bool){
       require(escrows[_contractId].exists); // check existence
