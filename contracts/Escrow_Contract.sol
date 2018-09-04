@@ -586,6 +586,8 @@ contract Escrow_Contract is Ownable {
   
   event DepositedToken(address indexed payee, uint256 tokenAmount);
   event WithdrawnToken(address indexed payee, uint256 tokenAmount);
+  event ConfirmEscrow(uint _contractId, address indexed confirmer);
+  
   REDTToken public token;
   
  
@@ -685,6 +687,8 @@ uint8 constant STATUS_DISPUTED = 0x06;
       escrows[_contractId].currentDepositBalance = tokens;
       escrows[_contractId].currentState = State(STATUS_DEPOSITTED, msg.sender);
       
+      emit DepositedToken(msg.sender, tokens);
+      
       return true;
   }
   
@@ -693,24 +697,26 @@ uint8 constant STATUS_DISPUTED = 0x06;
       require(msg.sender == escrows[_contractId].tenant || msg.sender == escrows[_contractId].landlord);
       require(escrows[_contractId].currentDepositBalance > 0);
       
-      if(msg.sender == escrows[_contractId].tenant){
-          token.transfer(escrows[_contractId].landlord, escrows[_contractId].depositTokenAmount);
-      }else {
-          token.transfer(escrows[_contractId].tenant, escrows[_contractId].depositTokenAmount);
-      }
+      address withdrawal = (msg.sender == escrows[_contractId].tenant) ? escrows[_contractId].landlord : escrows[_contractId].tenant;
+      
+      token.transfer(withdrawal, escrows[_contractId].depositTokenAmount);
       
       // update contract state
       escrows[_contractId].currentDepositBalance = 0;
       escrows[_contractId].currentState = State(STATUS_RELEASED, msg.sender);
       
+      emit WithdrawnToken(withdrawal, escrows[_contractId].depositTokenAmount);
+      
       return true;
   }
   
 
-  function confirmEscrow(uint _contractId) public returns (bool){
+  function confirmEscrow(uint _contractId) public {
       require(escrows[_contractId].exists); // check existence
       require(escrows[_contractId].tenant == msg.sender || escrows[_contractId].landlord == msg.sender);
       escrows[_contractId].approvalList[msg.sender] = true;
+      
+      emit ConfirmEscrow(_contractId, msg.sender);
   }
 
   function isConfirmed(uint _contractId, address _actor) public view returns (bool){
@@ -752,6 +758,8 @@ uint8 constant STATUS_DISPUTED = 0x06;
           escrows[_contractId].currentDepositBalance = 0;
           escrows[_contractId].currentState = State(STATUS_RELEASED, msg.sender);
           
+          emit WithdrawnToken(escrows[_contractId].landlord, escrows[_contractId].depositTokenAmount);
+          
       } else if (_action == ACTION_REQUEST_FUND_RELEASE_APPROVE_LANDLORD) {
           require(escrows[_contractId].currentDepositBalance > 0);
           require(escrows[_contractId].currentState.state == STATUS_REQUEST_FUND);
@@ -761,6 +769,8 @@ uint8 constant STATUS_DISPUTED = 0x06;
           // update state
           escrows[_contractId].currentDepositBalance = 0;
           escrows[_contractId].currentState = State(STATUS_RELEASED, msg.sender);
+          
+          emit WithdrawnToken(escrows[_contractId].tenant, escrows[_contractId].depositTokenAmount);
       } else {
           escrows[_contractId].currentState = State(STATUS_REQUEST_FUND, msg.sender);
       }
