@@ -13,6 +13,8 @@ const STATUS_DISPUTED = 6;
 var escrow_contract_address = null;
 var ERC20_Address = '';
 
+
+const numToken = Math.pow(10, 18);
 const zanis_acc = '0xdb8209274f8dd94ea9d38a7f9feae8ce83fb6388';
 const lubu_acc = '0x7c87200958b6831f7b803bc307e3793c4e98dd9e';
 const ryoma_acc = '0x7f7d47d2705102e87316d580f462eb72e6ab395b';
@@ -21,7 +23,7 @@ const new_escrowContract = {
     tenant: lubu_acc,
     landlord: ryoma_acc,
     contract_id: 456,
-    depositValue: 50,
+    depositValue: 50 * numToken,
     hashDoc: '0xb424839777e8131ea2d999b4263a07d0f91541938d85e7d84de8048672d6f8b6',
     expiry: Math.round(3600 * 24 + Date.now() / 1000)
 };
@@ -66,7 +68,7 @@ describe('Surrender Flow of Testing', function () {
         });
     };
 
-    describe.skip('Tenant Surrender', function (done) {
+    describe('Tenant Surrender', function (done) {
         before(function (done) {
             setUpTest(done);
         });
@@ -133,7 +135,7 @@ describe('Surrender Flow of Testing', function () {
         });
     });
 
-    describe.skip('Landlord Surrender', function (done) {
+    describe('Landlord Surrender', function (done) {
         before(function (done) {
             setUpTest(done);
         });
@@ -201,7 +203,7 @@ describe('Surrender Flow of Testing', function () {
     });
 
 
-    describe.skip('TENANT REQUESTS AND LANDLORD APPROVES', function (done) {
+    describe('TENANT REQUESTS AND LANDLORD APPROVES', function (done) {
         before(function (done) {
             setUpTest(done);
         });
@@ -302,7 +304,7 @@ describe('Surrender Flow of Testing', function () {
     });
 
 
-    describe.skip('LANDLORD REQUESTS AND TENANT APPROVES', function (done) {
+    describe('LANDLORD REQUESTS AND TENANT APPROVES', function (done) {
         before(function (done) {
             setUpTest(done);
         });

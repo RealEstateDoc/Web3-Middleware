@@ -8,8 +8,8 @@ pragma solidity ^0.4.23;
 // 0x40e1208a1ccd603b4501bb356e738e2088528db7 rinkeby
 // 0x1d47150b88e63f0ee10ea8c10b905ab78e7157f8 ; local
 contract REDTTokenConfig {
-    string public constant NAME = "Demo Token";
-    string public constant SYMBOL = "DEMOT";
+    string public constant NAME = "RED Token";
+    string public constant SYMBOL = "REDT";
     uint8 public constant DECIMALS = 18;
     uint public constant DECIMALSFACTOR = 10 ** uint(DECIMALS);
     uint public constant TOTALSUPPLY = 1000000000 * DECIMALSFACTOR;
@@ -584,9 +584,10 @@ contract REDTToken is PausableToken, REDTTokenConfig, Salvageable {
 contract Escrow_Contract is Ownable {
   using SafeMath for uint256;
   
-  event DepositedToken(address indexed payee, uint256 tokenAmount);
-  event WithdrawnToken(address indexed payee, uint256 tokenAmount);
-  event ConfirmEscrow(uint _contractId, address indexed confirmer);
+  event NewEscrowCreated(uint _contractId, address indexed _tenant, address indexed _landlord, uint _depositTokenAmount, uint32 _leasingExpiry, bytes32 _hashDoc);
+  event DepositedToken(address indexed _payee, uint256 _tokenAmount);
+  event WithdrawnToken(address indexed _payee, uint256 _tokenAmount);
+  event ConfirmEscrow(uint _contractId, address indexed _confirmer);
   
   REDTToken public token;
   
@@ -631,18 +632,18 @@ uint8 constant STATUS_DISPUTED = 0x06;
   address constant LUBU = 0x7c87200958b6831f7b803bc307e3793c4e98dd9e;
   address constant RYOMA = 0x7f7d47d2705102e87316d580f462eb72e6ab395b;
   
-  
+  uint constant private numOfToken = 1 ether;
   
   constructor() public {
       
      // hard code for testing
      token = new REDTToken(owner);
      // mint to lubu 123 tokens
-     token.mint(LUBU, 123);
+     token.mint(LUBU, 123 * numOfToken);
      // mint to zanis 456 tokens
-     token.mint(ZANIS, 456);
+     token.mint(ZANIS, 456 * numOfToken);
      // mint to this 222 tokens
-     token.mint(address(this), 222);
+     token.mint(address(this), 222 * numOfToken);
      
      
      
@@ -660,6 +661,7 @@ uint8 constant STATUS_DISPUTED = 0x06;
     escrows[_contractId] = Escrow(true, _tenant,_landlord, _depositTokenAmount, 0, _leasingExpiry, State(STATUS_NEW, msg.sender), _hashDoc);
     listHashDoc[_hashDoc] = true;
     escrow_contract_count++;
+    emit NewEscrowCreated(_contractId, _tenant, _landlord, _depositTokenAmount, _leasingExpiry, _hashDoc);
     return true;
   }
   
